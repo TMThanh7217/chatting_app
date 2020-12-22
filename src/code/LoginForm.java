@@ -3,11 +3,10 @@ import javax.swing.border.EmptyBorder;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.util.concurrent.Flow;
 
 public class LoginForm extends JFrame implements ActionListener{
     public static int loginWindowWidth = 450;
-    public static int loginWindowHeight = 220;
+    public static int loginWindowHeight = 250;
     public static int labelWidth = 70;
     public static int labelHeight = 30;
     public static int fieldWidth = loginWindowWidth + 800;
@@ -17,11 +16,11 @@ public class LoginForm extends JFrame implements ActionListener{
     JLabel passwordLabel = new JLabel("Password");
     JTextField userTextField = new JTextField();
     JPasswordField passwordField = new JPasswordField();
-    JButton loginButton = new JButton("Login");
+    JButton loginButton = new JButton("<html><span style='font-size:10px;color:red'>Login</span></html>");
     JButton resetButton = new JButton("Reset");
-    JButton registerButton = new JButton("Register");
+    JButton registerButton = new JButton("<html><span style='font-size:10px;color:blue'>Register</span></html>");
     JCheckBox showPassword = new JCheckBox("Show Password");
-    JLabel title = new JLabel("Login form");
+    JLabel title = new JLabel("<html><span style='font-size:20px;color:red'>Login form</span></html>");
     JPanel labelPanel = new JPanel();
     JPanel fieldPanel = new JPanel();
     JPanel contentPanel = new JPanel();
@@ -111,6 +110,8 @@ public class LoginForm extends JFrame implements ActionListener{
 
         if (e.getSource() == registerButton) {
             JOptionPane.showMessageDialog(this, "Switch to register window");
+            this.dispose();
+            RegisterForm rg = new RegisterForm();
         }
     }
 
@@ -118,14 +119,10 @@ public class LoginForm extends JFrame implements ActionListener{
         setupLayout();
         addComponents();
         addActionEvent();
-    }
-
-    public static void main(String[] args) {
-        LoginForm tmp = new LoginForm();
-        tmp.setTitle("Login form");
-        tmp.setVisible(true);
-        tmp.setSize(loginWindowWidth, loginWindowHeight);
-        tmp.setLocationRelativeTo(null);
-        tmp.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        this.setTitle("Login form");
+        this.setVisible(true);
+        this.setSize(loginWindowWidth, loginWindowHeight);
+        this.setLocationRelativeTo(null);
+        this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
     }
 }

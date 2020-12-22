@@ -3,7 +3,6 @@ import javax.swing.border.EmptyBorder;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.util.concurrent.Flow;
 
 public class RegisterForm extends JFrame implements ActionListener{
     public static int registerWindowWidth = 500;
@@ -21,11 +20,11 @@ public class RegisterForm extends JFrame implements ActionListener{
     JTextField userTextField = new JTextField();
     JPasswordField passwordField = new JPasswordField();
     JPasswordField confirmPwdField = new JPasswordField();
-    JButton loginButton = new JButton("Login");
+    JButton loginButton = new JButton("<html><span style='font-size:10px;color:red'>Login</span></html>");
     JButton resetButton = new JButton("Reset");
-    JButton registerButton = new JButton("Register");
+    JButton registerButton = new JButton("<html><span style='font-size:10px;color:blue'>Register</span></html>");
     JCheckBox showPassword = new JCheckBox("Show Password");
-    JLabel title = new JLabel("Register form");
+    JLabel title = new JLabel("<html><span style='font-size:20px;color:blue'>Register form</span></html>");
     JPanel labelPanel = new JPanel();
     JPanel fieldPanel = new JPanel();
     JPanel contentPanel = new JPanel();
@@ -102,6 +101,8 @@ public class RegisterForm extends JFrame implements ActionListener{
         //Login button
         if (e.getSource() == loginButton) {
             JOptionPane.showMessageDialog(this, "Switch to login form");
+            this.dispose();
+            LoginForm lf = new LoginForm();
         }
         //Reset button
         if (e.getSource() == resetButton) {
@@ -126,14 +127,10 @@ public class RegisterForm extends JFrame implements ActionListener{
         setupLayout();
         addComponents();
         addActionEvent();
-    }
-
-    public static void main(String[] args) {
-        RegisterForm tmp = new RegisterForm();
-        tmp.setTitle("Register form");
-        tmp.setVisible(true);
-        tmp.setSize(registerWindowWidth, registerWindowHeight);
-        tmp.setLocationRelativeTo(null);
-        tmp.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        this.setTitle("Register form");
+        this.setVisible(true);
+        this.setSize(registerWindowWidth, registerWindowHeight);
+        this.setLocationRelativeTo(null);
+        this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
     }
 }
