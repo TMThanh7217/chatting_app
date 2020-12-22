@@ -6,17 +6,21 @@ import java.awt.event.ActionListener;
 import java.util.concurrent.Flow;
 
 public class RegisterForm extends JFrame implements ActionListener{
-    public static int registerWindowWidth = 450;
-    public static int registerWindowHeight = 220;
+    public static int registerWindowWidth = 500;
+    public static int registerWindowHeight = 280;
     public static int labelWidth = 70;
     public static int labelHeight = 30;
     public static int fieldWidth = registerWindowWidth + 800;
     public static int fieldHeight = 30;
 
+    JLabel nameLabel = new JLabel("Name");
     JLabel userLabel = new JLabel("Username");
     JLabel passwordLabel = new JLabel("Password");
+    JLabel confirmPwdLabel = new JLabel("Re-enter password");
+    JTextField nameTextField = new JTextField();
     JTextField userTextField = new JTextField();
     JPasswordField passwordField = new JPasswordField();
+    JPasswordField confirmPwdField = new JPasswordField();
     JButton loginButton = new JButton("Login");
     JButton resetButton = new JButton("Reset");
     JButton registerButton = new JButton("Register");
@@ -37,14 +41,22 @@ public class RegisterForm extends JFrame implements ActionListener{
         fieldPanel.setLayout(new BoxLayout(fieldPanel, BoxLayout.Y_AXIS));
         misc.setLayout(new BoxLayout(misc, BoxLayout.Y_AXIS));
         btnPanel.setLayout(new FlowLayout());
+        nameLabel.setPreferredSize(new Dimension(labelWidth, labelHeight));
+        nameLabel.setMaximumSize(new Dimension(labelWidth, labelHeight));
         userLabel.setPreferredSize(new Dimension(labelWidth, labelHeight));
         userLabel.setMaximumSize(new Dimension(labelWidth, labelHeight));
         passwordLabel.setPreferredSize(new Dimension(labelWidth, labelHeight));
         passwordLabel.setMaximumSize(new Dimension(labelWidth, labelHeight));
+        confirmPwdLabel.setPreferredSize(new Dimension(labelWidth + 50, labelHeight));
+        confirmPwdLabel.setMaximumSize(new Dimension(labelWidth + 50, labelHeight));
+        nameTextField.setPreferredSize(new Dimension(fieldWidth, fieldHeight));
+        nameTextField.setMaximumSize(new Dimension(fieldWidth, fieldHeight));
         userTextField.setPreferredSize(new Dimension(fieldWidth, fieldHeight));
         userTextField.setMaximumSize(new Dimension(fieldWidth, fieldHeight));
         passwordField.setPreferredSize(new Dimension(fieldWidth, fieldHeight));
         passwordField.setMaximumSize(new Dimension(fieldWidth, fieldHeight));
+        confirmPwdField.setPreferredSize(new Dimension(fieldWidth - 100, fieldHeight));
+        confirmPwdField.setMaximumSize(new Dimension(fieldWidth - 100, fieldHeight));
         showPwdPanel.setLayout(new FlowLayout());
         primaryPanel.setLayout(new FlowLayout());
         this.setContentPane(contentPanel);
@@ -53,11 +65,16 @@ public class RegisterForm extends JFrame implements ActionListener{
     public void addComponents() {
         contentPanel.add(title, BorderLayout.NORTH);
         labelPanel.setBorder(new EmptyBorder(5, 6, 2, 0));
+        labelPanel.add(nameLabel);
         labelPanel.add(userLabel);
         labelPanel.add(passwordLabel);
+        labelPanel.add(confirmPwdLabel);
+
         fieldPanel.setBorder(new EmptyBorder(5, 0, 2, 6));
+        fieldPanel.add(nameTextField);
         fieldPanel.add(userTextField);
         fieldPanel.add(passwordField);
+        fieldPanel.add(confirmPwdField);
 
         showPwdPanel.add(showPassword);
         btnPanel.add(loginButton);
