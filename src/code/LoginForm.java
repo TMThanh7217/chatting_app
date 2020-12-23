@@ -3,6 +3,8 @@ import javax.swing.border.EmptyBorder;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.*;
+import java.util.*;
 
 public class LoginForm extends JFrame implements ActionListener{
     public static int loginWindowWidth = 450;
@@ -11,6 +13,7 @@ public class LoginForm extends JFrame implements ActionListener{
     public static int labelHeight = 30;
     public static int fieldWidth = loginWindowWidth + 800;
     public static int fieldHeight = 30;
+    public static String user_data_path = "data/user_data.txt";
 
     JLabel userLabel = new JLabel("Username");
     JLabel passwordLabel = new JLabel("Password");
@@ -85,14 +88,38 @@ public class LoginForm extends JFrame implements ActionListener{
         if (e.getSource() == loginButton) {
             String userText;
             String pwdText;
+            boolean userExist = false;
             userText = userTextField.getText();
             pwdText = passwordField.getText();
-            if (userText.equalsIgnoreCase("a") && pwdText.equalsIgnoreCase("a")) {
+            File file_in = new File(user_data_path);
+            ArrayList<String> user_data = new ArrayList();
+            if (file_in.exists()) {
+                try {
+                    Scanner sc = new Scanner(file_in);
+                    while (sc.hasNextLine()) {
+                        String tmp = sc.nextLine();
+                        user_data.add(tmp);
+                    }
+                } catch (FileNotFoundException err) {
+                    System.out.println(err.getMessage());
+                    err.printStackTrace();
+                }
+            } else {
+                System.out.println("The file does not exist.");
+            }
+
+            for (int i = 0; i < user_data.size() - 2; i += 3) {
+                //System.out.println(user_data.get(i) + "\n" + user_data.get(i + 1) + "\n-----------------------------");
+                if (userText.equals(user_data.get(i + 1)) && pwdText.equals(user_data.get(i + 2))) {
+                    userExist = true;
+                    break;
+                }
+            }
+            if (userExist) {
                 JOptionPane.showMessageDialog(this, "Login Successful");
             } else {
                 JOptionPane.showMessageDialog(this, "Invalid Username or Password");
             }
-
         }
         //Reset button
         if (e.getSource() == resetButton) {

@@ -3,6 +3,9 @@ import javax.swing.border.EmptyBorder;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.*;
+import java.util.ArrayList;
+import java.util.Scanner;
 
 public class RegisterForm extends JFrame implements ActionListener{
     public static int registerWindowWidth = 500;
@@ -11,6 +14,7 @@ public class RegisterForm extends JFrame implements ActionListener{
     public static int labelHeight = 30;
     public static int fieldWidth = registerWindowWidth + 800;
     public static int fieldHeight = 30;
+    public static String user_data_path = "data/user_data.txt";
 
     JLabel nameLabel = new JLabel("Name");
     JLabel userLabel = new JLabel("Username");
@@ -119,8 +123,60 @@ public class RegisterForm extends JFrame implements ActionListener{
         }
 
         if (e.getSource() == registerButton) {
-            JOptionPane.showMessageDialog(this, "Register successful");
+            String userText, pwdText, nameText;
+            nameText = nameTextField.getText();
+            userText = userTextField.getText();
+            pwdText = passwordField.getText();
+            boolean userExist = checkUserExist(user_data_path, userText, pwdText);
+
+            if (!userExist) {
+                try {
+                    FileWriter my_writer = new FileWriter(user_data_path, true);
+                    System.out.println(nameText + userText + pwdText);
+                    my_writer.write("\n" + nameText + "\n");
+                    my_writer.write(userText + "\n");
+                    my_writer.write(pwdText);
+                    my_writer.close();
+                } catch (IOException err) {
+                    System.out.println(err.getMessage());
+                    err.printStackTrace();
+                }
+                JOptionPane.showMessageDialog(this, "Register Successful");
+            }
+            else {
+                JOptionPane.showMessageDialog(this, "User already exist");
+            }
         }
+    }
+
+    public boolean checkUserExist(String path, String userText, String pwdText) {
+        boolean userExist = false;
+        File file_in = new File(path);
+        ArrayList<String> user_data = new ArrayList();
+        if (file_in.exists()) {
+            try {
+                Scanner sc = new Scanner(file_in);
+                while (sc.hasNextLine()) {
+                    String tmp = sc.nextLine();
+                    user_data.add(tmp);
+                }
+            } catch (FileNotFoundException err) {
+                System.out.println(err.getMessage());
+                err.printStackTrace();
+            }
+        } else {
+            System.out.println("The file does not exist.");
+        }
+
+        for (int i = 0; i < user_data.size() - 2; i += 3) {
+            //System.out.println(user_data.get(i) + "\n" + user_data.get(i + 1) + "\n-----------------------------");
+            if (userText.equals(user_data.get(i + 1)) && pwdText.equals(user_data.get(i + 2))) {
+                userExist = true;
+                break;
+            }
+        }
+
+       return userExist;
     }
 
     RegisterForm() {
