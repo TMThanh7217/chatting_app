@@ -117,6 +117,8 @@ public class LoginForm extends JFrame implements ActionListener{
             }
             if (userExist) {
                 JOptionPane.showMessageDialog(this, "Login Successful");
+                this.dispose();
+                ChatUI myChatUI = new ChatUI();
             } else {
                 JOptionPane.showMessageDialog(this, "Invalid Username or Password");
             }
