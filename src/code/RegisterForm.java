@@ -117,20 +117,27 @@ public class RegisterForm extends JFrame implements ActionListener{
         if (e.getSource() == showPassword) {
             if (showPassword.isSelected()) {
                 passwordField.setEchoChar((char) 0);
+                confirmPwdField.setEchoChar((char) 0);
             } else {
                 passwordField.setEchoChar('*');
+                confirmPwdField.setEchoChar('*');
             }
         }
 
         if (e.getSource() == registerButton) {
-            String userText, pwdText, nameText;
+            String userText, pwdText, nameText, confirmPwdText;
             nameText = nameTextField.getText();
             userText = userTextField.getText();
             pwdText = passwordField.getText();
+            confirmPwdText = confirmPwdField.getText();
             boolean userExist = checkUserExist(user_data_path, userText, pwdText);
 
-            if (!userExist) {
+            if (!userExist && pwdText.equals(confirmPwdText)) {
                 try {
+                    // user data written in following format:
+                    // Display name
+                    // username
+                    // password
                     FileWriter my_writer = new FileWriter(user_data_path, true);
                     System.out.println(nameText + userText + pwdText);
                     my_writer.write("\n" + nameText + "\n");
@@ -141,10 +148,15 @@ public class RegisterForm extends JFrame implements ActionListener{
                     System.out.println(err.getMessage());
                     err.printStackTrace();
                 }
-                JOptionPane.showMessageDialog(this, "Register Successful");
+                JOptionPane.showMessageDialog(this, "Register Successful, redirect to Login form");
+                this.dispose();
+                LoginForm lf = new LoginForm();
             }
             else {
-                JOptionPane.showMessageDialog(this, "User already exist");
+                if (!pwdText.equals(confirmPwdText))
+                    JOptionPane.showMessageDialog(this, "Re enter wrong password");
+                else
+                    JOptionPane.showMessageDialog(this, "User already exist");
             }
         }
     }

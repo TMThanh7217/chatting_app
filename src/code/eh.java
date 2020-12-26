@@ -9,16 +9,15 @@ import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.net.Socket;
 
-public class ChatUI extends JFrame implements Runnable {
+public class eh extends JFrame implements Runnable {
     public static int chatUIWidth = 800;
     public static int chatUIHeight = 450;
     public static int topMargin = chatUIWidth / 25;
-    public static String host = "localhost";
     public static int port = 5000;
     public static String username = "";
 
     public static void setUsername(String username) {
-        ChatUI.username = username;
+        eh.username = username;
     }
 
     JPanel contentPanel = new JPanel();
@@ -32,8 +31,8 @@ public class ChatUI extends JFrame implements Runnable {
     JButton sendButton = new JButton("Send");
     JPanel inputAreaPanel = new JPanel();
 
-    JTextField ipTf = new JTextField(host);
-    JTextField portTf = new JTextField(Integer.toString(port));
+    JTextField ipTf = new JTextField("Local host");
+    JTextField portTf = new JTextField();
     JPanel ipPanel = new JPanel();
     JPanel portPanel = new JPanel();
 
@@ -67,7 +66,6 @@ public class ChatUI extends JFrame implements Runnable {
 
         ipTf.setEditable(false);
         //ipTf.setEnabled(false);
-        portTf.setEditable(false);
         ipPanel.setLayout(new BorderLayout());
         portPanel.setLayout(new BorderLayout());
 
@@ -120,22 +118,9 @@ public class ChatUI extends JFrame implements Runnable {
         //add event part
         sendButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent ae) {
-                String str = "user | " + username + "\n"+ inputArea.getText();
-                try {
-                    bfWriter.write(str);
-                    bfWriter.write("\r\n");
-                    bfWriter.flush();
-                } catch(Exception e){
-                    e.printStackTrace();
-                }
-                inputArea.setText("");
-            }
-        });
-
-        sendFileBtn.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent ae) {
-                String str = "user | " + username + "\n"+ inputArea.getText();
-                try {
+                String str = username + "\n"+ inputArea.getText();
+                System.out.print(str);
+                try{
                     bfWriter.write(str);
                     bfWriter.write("\r\n");
                     bfWriter.flush();
@@ -147,7 +132,7 @@ public class ChatUI extends JFrame implements Runnable {
         });
     }
 
-    /*ChatUI() {
+    eh() {
         setupLayout();
         addComponents();
         this.setTitle("Chat UI");
@@ -158,16 +143,16 @@ public class ChatUI extends JFrame implements Runnable {
 
         //Open socket here
         try {
-            Socket socketClient = new Socket(host, port);
+            Socket socketClient = new Socket("localhost", port);
             bfWriter = new BufferedWriter(new OutputStreamWriter(socketClient.getOutputStream()));
             bfReader = new BufferedReader(new InputStreamReader(socketClient.getInputStream()));
         } catch(Exception e) {
             e.printStackTrace();
         }
-    }*/
+    }
 
-    ChatUI(String myUsername) {
-        ChatUI.setUsername(myUsername);  // call this before adding any component
+    eh(String myUsername) {
+        eh.setUsername(myUsername);  // call this before adding any component
         setupLayout();
         addComponents();
         this.setTitle("Chat UI");
@@ -178,7 +163,7 @@ public class ChatUI extends JFrame implements Runnable {
 
         //Open socket here
         try {
-            Socket socketClient = new Socket(host, port);
+            Socket socketClient = new Socket("localhost", port);
             bfWriter = new BufferedWriter(new OutputStreamWriter(socketClient.getOutputStream()));
             bfReader = new BufferedReader(new InputStreamReader(socketClient.getInputStream()));
         } catch(Exception e) {
@@ -189,18 +174,17 @@ public class ChatUI extends JFrame implements Runnable {
     public void run() {
         try {
             String msg = "";
-            while ((msg = bfReader.readLine()) != null) {
+            while((msg = bfReader.readLine()) != null){
                 chatScreen.append(msg + "\n");
-                //msg = bfReader.readLine();
             }
         } catch(Exception e) {
             e.printStackTrace();
         }
     }
 
-    /*public static void main(String[] args) {
-        ChatUI a = new ChatUI("aaaaa");
+    public static void main(String[] args) {
+        eh a = new eh("aaaaa");
         Thread t1 = new Thread(a);
         t1.start();
-    }*/
+    }
 }
