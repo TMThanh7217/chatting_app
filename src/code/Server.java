@@ -10,19 +10,19 @@ import java.util.*;
 import static java.lang.Integer.parseInt;
 
 public class Server implements Runnable {
-    /*public static int serverUIWidth = 400;
+    public static int serverUIWidth = 400;
     public static int serverUIHeight = 150;
-    public static int topMargin = serverUIWidth / 25;*/
+    public static int topMargin = serverUIWidth / 25;
 
     public static String host = "localhost";
     public static int port = 5000;
     public static Vector client = new Vector();
     Socket socket;
 
-    /*static JFrame serverFrame = new JFrame();
+    static JFrame serverFrame = new JFrame();
     static JPanel contentPanel = new JPanel();
 
-    static JTextField ipTf = new JTextField("Local host");
+    static JTextField ipTf = new JTextField(host);
     static JTextField portTf = new JTextField();
     static JPanel ipPanel = new JPanel();
     static JPanel portPanel = new JPanel();
@@ -63,16 +63,40 @@ public class Server implements Runnable {
         contentPanel.setBorder(new TitledBorder(new EmptyBorder(0, 0, 0, 0), "Server"));
 
         //add event part
+
         connectBtn.addActionListener(new ActionListener() {
+            @Override
             public void actionPerformed(ActionEvent ae) {
-                int myport = parseInt(portTf.getText());
-                if (port > 500) {
-                    JOptionPane.showMessageDialog(serverFrame, "Connect to port " + myport + " successfully");
+                if (isInt(portTf.getText())) {
+                    int myport = parseInt(portTf.getText());
                     port = myport;
                     serverFrame.dispose();
+                    if (port > 2000) {
+                        JOptionPane.showMessageDialog(serverFrame, "Connect to port " + port + " successfully");
+                        ServerSocket ss = null;
+                        try {
+                            ss = new ServerSocket(port);
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                        }
+                        System.out.println(port);
+                        while (true) {
+                            Socket socket = null;
+                            try {
+                                socket = ss.accept();
+                            } catch (IOException e) {
+                                e.printStackTrace();
+                            }
+                            Server server = new Server(socket);
+                            Thread thread = new Thread(server);
+                            thread.start();
+                        }
+                    } else {
+                        JOptionPane.showMessageDialog(serverFrame, "Try another port that is greater than 500");
+                    }
                 }
                 else {
-                    JOptionPane.showMessageDialog(serverFrame, "Try another port that is greater than 500");
+                    JOptionPane.showMessageDialog(serverFrame, "Invalid port");
                 }
             }
         });
@@ -86,7 +110,7 @@ public class Server implements Runnable {
         serverFrame.setSize(serverUIWidth, serverUIHeight);
         serverFrame.setLocationRelativeTo(null); // set window open at the middle of the screen
         serverFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-    }*/
+    }
 
     Server(Socket socket) {
         try {
@@ -122,13 +146,18 @@ public class Server implements Runnable {
         }
     }
 
-    public static void main(String[] args) throws Exception {
-        ServerSocket ss = new ServerSocket(port);
-        while(true) {
-            Socket socket = ss.accept();
-            Server server = new Server(socket);
-            Thread thread = new Thread(server);
-            thread.start();
+    //misc function
+    public static boolean isInt(String str) {
+        try {
+            Integer.parseInt(str);
+            return true;
+        } catch(NumberFormatException e) {
+            e.printStackTrace();
+            return false;
         }
+    }
+
+    public static void main(String[] args) throws Exception {
+        serverGUI();
     }
 }

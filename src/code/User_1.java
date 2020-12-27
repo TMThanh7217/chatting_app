@@ -9,16 +9,16 @@ import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.net.Socket;
 
-public class ChatUI extends JFrame implements Runnable {
+public class User_1 extends JFrame implements Runnable {
     public static int chatUIWidth = 800;
     public static int chatUIHeight = 450;
     public static int topMargin = chatUIWidth / 25;
     public static String host = "localhost";
-    public static int port = 5000;
+    public static int port = 6000;
     public static String username = "";
 
     public static void setUsername(String username) {
-        ChatUI.username = username;
+        User_1.username = username;
     }
 
     JPanel contentPanel = new JPanel();
@@ -67,7 +67,8 @@ public class ChatUI extends JFrame implements Runnable {
 
         ipTf.setEditable(false);
         //ipTf.setEnabled(false);
-        portTf.setEditable(false);
+
+        //portTf.setEditable(false);
         ipPanel.setLayout(new BorderLayout());
         portPanel.setLayout(new BorderLayout());
 
@@ -118,6 +119,34 @@ public class ChatUI extends JFrame implements Runnable {
         contentPanel.add(rightPanel, BorderLayout.EAST);
 
         //add event part
+        //start thread when connect button is hit
+        User_1 myUser_1 = this;  //get current User_1
+        connectBtn.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                if (isInt(portTf.getText())) {
+                    int myPort = Integer.parseInt(portTf.getText());
+                    port = myPort;
+                    //Open socket here
+                    try {
+                        port = myPort;
+                        System.out.println(port);
+                        JOptionPane.showMessageDialog(myUser_1, "Connect to port " + port + " successfully");
+                        Socket socketUser_1 = new Socket(host, port);
+                        bfWriter = new BufferedWriter(new OutputStreamWriter(socketUser_1.getOutputStream()));
+                        bfReader = new BufferedReader(new InputStreamReader(socketUser_1.getInputStream()));
+                        Thread myThread = new Thread(myUser_1);
+                        myThread.start();
+                    } catch (Exception ex) {
+                        ex.printStackTrace();
+                    }
+                }
+                else {
+                    JOptionPane.showMessageDialog(myUser_1, "Invalid port");
+                }
+            }
+        });
+
         sendButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent ae) {
                 String str = "user | " + username + "\n"+ inputArea.getText();
@@ -147,43 +176,15 @@ public class ChatUI extends JFrame implements Runnable {
         });
     }
 
-    /*ChatUI() {
+    User_1(String myUsername) {
+        User_1.setUsername(myUsername);  // call this before adding any component
         setupLayout();
         addComponents();
-        this.setTitle("Chat UI");
+        this.setTitle("User_1");
         this.setVisible(true);
         this.setSize(chatUIWidth, chatUIHeight);
         this.setLocationRelativeTo(null); // set window open at the middle of the screen
         this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-
-        //Open socket here
-        try {
-            Socket socketClient = new Socket(host, port);
-            bfWriter = new BufferedWriter(new OutputStreamWriter(socketClient.getOutputStream()));
-            bfReader = new BufferedReader(new InputStreamReader(socketClient.getInputStream()));
-        } catch(Exception e) {
-            e.printStackTrace();
-        }
-    }*/
-
-    ChatUI(String myUsername) {
-        ChatUI.setUsername(myUsername);  // call this before adding any component
-        setupLayout();
-        addComponents();
-        this.setTitle("Chat UI");
-        this.setVisible(true);
-        this.setSize(chatUIWidth, chatUIHeight);
-        this.setLocationRelativeTo(null); // set window open at the middle of the screen
-        this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-
-        //Open socket here
-        try {
-            Socket socketClient = new Socket(host, port);
-            bfWriter = new BufferedWriter(new OutputStreamWriter(socketClient.getOutputStream()));
-            bfReader = new BufferedReader(new InputStreamReader(socketClient.getInputStream()));
-        } catch(Exception e) {
-            e.printStackTrace();
-        }
     }
 
     public void run() {
@@ -191,16 +192,24 @@ public class ChatUI extends JFrame implements Runnable {
             String msg = "";
             while ((msg = bfReader.readLine()) != null) {
                 chatScreen.append(msg + "\n");
-                //msg = bfReader.readLine();
             }
         } catch(Exception e) {
             e.printStackTrace();
         }
     }
 
-    /*public static void main(String[] args) {
-        ChatUI a = new ChatUI("aaaaa");
-        Thread t1 = new Thread(a);
-        t1.start();
-    }*/
+    //misc function
+    public static boolean isInt(String str) {
+        try {
+            Integer.parseInt(str);
+            return true;
+        } catch(NumberFormatException e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+
+    public static void main(String[] args) {
+        LoginForm lf = new LoginForm();
+    }
 }

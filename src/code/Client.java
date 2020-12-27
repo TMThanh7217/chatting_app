@@ -9,15 +9,16 @@ import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.net.Socket;
 
-public class eh extends JFrame implements Runnable {
+public class Client extends JFrame implements Runnable {
     public static int chatUIWidth = 800;
     public static int chatUIHeight = 450;
     public static int topMargin = chatUIWidth / 25;
-    public static int port = 5000;
+    public static String host = "localhost";
+    public static int port = 6000;
     public static String username = "";
 
     public static void setUsername(String username) {
-        eh.username = username;
+        Client.username = username;
     }
 
     JPanel contentPanel = new JPanel();
@@ -31,8 +32,8 @@ public class eh extends JFrame implements Runnable {
     JButton sendButton = new JButton("Send");
     JPanel inputAreaPanel = new JPanel();
 
-    JTextField ipTf = new JTextField("Local host");
-    JTextField portTf = new JTextField();
+    JTextField ipTf = new JTextField(host);
+    JTextField portTf = new JTextField(Integer.toString(port));
     JPanel ipPanel = new JPanel();
     JPanel portPanel = new JPanel();
 
@@ -66,6 +67,8 @@ public class eh extends JFrame implements Runnable {
 
         ipTf.setEditable(false);
         //ipTf.setEnabled(false);
+
+        //portTf.setEditable(false);
         ipPanel.setLayout(new BorderLayout());
         portPanel.setLayout(new BorderLayout());
 
@@ -116,11 +119,52 @@ public class eh extends JFrame implements Runnable {
         contentPanel.add(rightPanel, BorderLayout.EAST);
 
         //add event part
+        //start thread when connect button is hit
+        Client myClient = this;  //get current client
+        connectBtn.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                if (isInt(portTf.getText())) {
+                    int myPort = Integer.parseInt(portTf.getText());
+                    port = myPort;
+                    //Open socket here
+                    try {
+                        port = myPort;
+                        System.out.println(port);
+                        JOptionPane.showMessageDialog(myClient, "Connect to port " + port + " successfully");
+                        Socket socketClient = new Socket(host, port);
+                        bfWriter = new BufferedWriter(new OutputStreamWriter(socketClient.getOutputStream()));
+                        bfReader = new BufferedReader(new InputStreamReader(socketClient.getInputStream()));
+                        Thread myThread = new Thread(myClient);
+                        myThread.start();
+                    } catch (Exception ex) {
+                        ex.printStackTrace();
+                    }
+                }
+                else {
+                    JOptionPane.showMessageDialog(myClient, "Invalid port");
+                }
+            }
+        });
+
         sendButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent ae) {
-                String str = username + "\n"+ inputArea.getText();
-                System.out.print(str);
-                try{
+                String str = "user | " + username + "\n"+ inputArea.getText();
+                try {
+                    bfWriter.write(str);
+                    bfWriter.write("\r\n");
+                    bfWriter.flush();
+                } catch(Exception e){
+                    e.printStackTrace();
+                }
+                inputArea.setText("");
+            }
+        });
+
+        sendFileBtn.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent ae) {
+                String str = "user | " + username + "\n"+ inputArea.getText();
+                try {
                     bfWriter.write(str);
                     bfWriter.write("\r\n");
                     bfWriter.flush();
@@ -132,49 +176,21 @@ public class eh extends JFrame implements Runnable {
         });
     }
 
-    eh() {
+    Client(String myUsername) {
+        Client.setUsername(myUsername);  // call this before adding any component
         setupLayout();
         addComponents();
-        this.setTitle("Chat UI");
+        this.setTitle("Client");
         this.setVisible(true);
         this.setSize(chatUIWidth, chatUIHeight);
         this.setLocationRelativeTo(null); // set window open at the middle of the screen
         this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-
-        //Open socket here
-        try {
-            Socket socketClient = new Socket("localhost", port);
-            bfWriter = new BufferedWriter(new OutputStreamWriter(socketClient.getOutputStream()));
-            bfReader = new BufferedReader(new InputStreamReader(socketClient.getInputStream()));
-        } catch(Exception e) {
-            e.printStackTrace();
-        }
-    }
-
-    eh(String myUsername) {
-        eh.setUsername(myUsername);  // call this before adding any component
-        setupLayout();
-        addComponents();
-        this.setTitle("Chat UI");
-        this.setVisible(true);
-        this.setSize(chatUIWidth, chatUIHeight);
-        this.setLocationRelativeTo(null); // set window open at the middle of the screen
-        this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-
-        //Open socket here
-        try {
-            Socket socketClient = new Socket("localhost", port);
-            bfWriter = new BufferedWriter(new OutputStreamWriter(socketClient.getOutputStream()));
-            bfReader = new BufferedReader(new InputStreamReader(socketClient.getInputStream()));
-        } catch(Exception e) {
-            e.printStackTrace();
-        }
     }
 
     public void run() {
         try {
             String msg = "";
-            while((msg = bfReader.readLine()) != null){
+            while ((msg = bfReader.readLine()) != null) {
                 chatScreen.append(msg + "\n");
             }
         } catch(Exception e) {
@@ -182,9 +198,18 @@ public class eh extends JFrame implements Runnable {
         }
     }
 
+    //misc function
+    public static boolean isInt(String str) {
+        try {
+            Integer.parseInt(str);
+            return true;
+        } catch(NumberFormatException e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+
     public static void main(String[] args) {
-        eh a = new eh("aaaaa");
-        Thread t1 = new Thread(a);
-        t1.start();
+        LoginForm lf = new LoginForm();
     }
 }
