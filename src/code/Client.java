@@ -14,18 +14,6 @@ public class Client extends JFrame implements Runnable, Serializable {
     public static int port = 6000;
     public static String username = "";
 
-    // Transfer file stuff
-    private static final long serialVersionUID = 1L;
-
-    private String destinationDirectory;
-    private String sourceDirectory;
-    private String filename;
-    private long fileSize;
-    private int piecesOfFile;
-    private int lastByteLength;
-    private byte[] dataBytes;
-    private String status;
-
     public static void setUsername(String username) {
         Client.username = username;
     }

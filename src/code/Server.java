@@ -32,17 +32,6 @@ public class Server implements Runnable {
     static JButton connectBtn = new JButton("Connect");
     static JPanel btnPanel = new JPanel();
 
-    // Transfer file stuff
-    private static final long serialVersionUID = 1L;
-
-    private String destinationDirectory;
-    private String sourceDirectory;
-    private String filename;
-    private long fileSize;
-    private int piecesOfFile;
-    private int lastByteLength;
-    private byte[] dataBytes;
-    private String status;
     public static void setupLayout() {
         ipTf.setEditable(false);
         //ipTf.setEnabled(false);
@@ -54,7 +43,7 @@ public class Server implements Runnable {
         infoPanel.setLayout(new FlowLayout());
         btnPanel.setLayout(new BoxLayout(btnPanel, BoxLayout.Y_AXIS));
         btnPanel.setPreferredSize(new Dimension(serverUIWidth / 2 - serverUIWidth / 4, serverUIWidth / 2 - serverUIWidth / 4));
-        
+
         contentPanel.setLayout(new FlowLayout());  // content panel store every other panel
         serverFrame.setContentPane(contentPanel);
     }
