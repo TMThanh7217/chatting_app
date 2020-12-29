@@ -16,7 +16,7 @@ public class Server implements Runnable {
 
     public static String host = "localhost";
     public static int port = 5000;
-    public static Vector client = new Vector();
+    public static Vector client = new Vector(); // hold all client
     Socket socket;
 
     static JFrame serverFrame = new JFrame();
@@ -32,6 +32,17 @@ public class Server implements Runnable {
     static JButton connectBtn = new JButton("Connect");
     static JPanel btnPanel = new JPanel();
 
+    // Transfer file stuff
+    private static final long serialVersionUID = 1L;
+
+    private String destinationDirectory;
+    private String sourceDirectory;
+    private String filename;
+    private long fileSize;
+    private int piecesOfFile;
+    private int lastByteLength;
+    private byte[] dataBytes;
+    private String status;
     public static void setupLayout() {
         ipTf.setEditable(false);
         //ipTf.setEnabled(false);
@@ -79,7 +90,7 @@ public class Server implements Runnable {
                         } catch (Exception e) {
                             e.printStackTrace();
                         }
-                        System.out.println(port);
+                        //System.out.println(port);
                         while (true) {
                             Socket socket = null;
                             try {
@@ -128,8 +139,9 @@ public class Server implements Runnable {
 
             while(true) {
                 String data = bfReader.readLine().trim();
-                System.out.println("Received " + data);
+                //System.out.println("Received " + data);
 
+                // write to all client
                 for(int i = 0; i < client.size(); i++) {
                     try {
                         BufferedWriter bw = (BufferedWriter)client.get(i);

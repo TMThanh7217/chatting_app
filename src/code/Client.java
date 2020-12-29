@@ -3,19 +3,28 @@ import javax.swing.border.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.io.BufferedReader;
-import java.io.BufferedWriter;
-import java.io.InputStreamReader;
-import java.io.OutputStreamWriter;
+import java.io.*;
 import java.net.Socket;
 
-public class Client extends JFrame implements Runnable {
+public class Client extends JFrame implements Runnable, Serializable {
     public static int chatUIWidth = 800;
     public static int chatUIHeight = 450;
     public static int topMargin = chatUIWidth / 25;
     public static String host = "localhost";
     public static int port = 6000;
     public static String username = "";
+
+    // Transfer file stuff
+    private static final long serialVersionUID = 1L;
+
+    private String destinationDirectory;
+    private String sourceDirectory;
+    private String filename;
+    private long fileSize;
+    private int piecesOfFile;
+    private int lastByteLength;
+    private byte[] dataBytes;
+    private String status;
 
     public static void setUsername(String username) {
         Client.username = username;
@@ -130,7 +139,7 @@ public class Client extends JFrame implements Runnable {
                     //Open socket here
                     try {
                         port = myPort;
-                        System.out.println(port);
+                        //System.out.println(port);
                         JOptionPane.showMessageDialog(myClient, "Connect to port " + port + " successfully");
                         Socket socketClient = new Socket(host, port);
                         bfWriter = new BufferedWriter(new OutputStreamWriter(socketClient.getOutputStream()));
@@ -163,15 +172,19 @@ public class Client extends JFrame implements Runnable {
 
         sendFileBtn.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent ae) {
-                String str = "user | " + username + "\n"+ inputArea.getText();
-                try {
-                    bfWriter.write(str);
-                    bfWriter.write("\r\n");
-                    bfWriter.flush();
-                } catch(Exception e){
-                    e.printStackTrace();
+                JFileChooser fc = new JFileChooser(); //points to user's default directory
+                int option = fc.showOpenDialog(null);
+                // if user choose other option bfWriter will be null and throw exception so check it first
+                if (option == JFileChooser.APPROVE_OPTION) {
+                    String str = "user | " + username + "\n" + fc.getSelectedFile().getAbsolutePath();
+                    try {
+                        bfWriter.write(str);
+                        bfWriter.write("\r\n");
+                        bfWriter.flush();
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
                 }
-                inputArea.setText("");
             }
         });
     }
