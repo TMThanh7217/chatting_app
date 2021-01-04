@@ -19,6 +19,8 @@ public class Server implements Runnable {
     public static Vector client = new Vector(); // hold all client
     Socket socket;
 
+    public static int fileSize = 10000;
+
     static JFrame serverFrame = new JFrame();
     static JPanel contentPanel = new JPanel();
 
@@ -125,6 +127,17 @@ public class Server implements Runnable {
             BufferedReader bfReader = new BufferedReader(new InputStreamReader(socket.getInputStream()));
             BufferedWriter bfWriter = new BufferedWriter(new OutputStreamWriter(socket.getOutputStream()));
             client.add(bfWriter);
+            ObjectInputStream ois = null;
+            ObjectOutputStream oos;
+            String storeFile = "";
+
+            try {
+                ois = new ObjectInputStream(socket.getInputStream());
+                oos = new ObjectOutputStream(socket.getOutputStream());
+            } catch (Exception e) {
+                System.out.println("Just ignore this for now, ehe");
+            }
+
 
             while(true) {
                 String data = bfReader.readLine().trim();
@@ -141,9 +154,42 @@ public class Server implements Runnable {
                         e.printStackTrace();
                     }
                 }
+
+                // receive file stuff
+                try {
+                    if (ois != null) {
+                        storeFile = (String) ois.readObject();
+                        byte[] contents = new byte[fileSize];
+                        //Initialize the FileOutputStream to the output file's full path.
+                        FileOutputStream fos = new FileOutputStream(storeFile);
+                        BufferedOutputStream bos = new BufferedOutputStream(fos);
+                        InputStream is = socket.getInputStream();
+                        String strLength = (String) ois.readObject();
+                        int fileLength = Integer.valueOf(strLength);
+                        int bytesRead = 0;
+                        int[] total = new int[1];
+                        while ((bytesRead = is.read(contents)) != -1) {
+                            total[0] = total[0] + bytesRead;
+                            bos.write(contents, 0, bytesRead);
+                            if (total[0] == fileLength) {
+                                break;
+                            }
+                        }
+                        System.out.print("Str length: " + strLength);
+                        bos.flush();
+                    }
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
             }
         } catch(Exception e) {
             e.printStackTrace();
+        } finally {
+            try {
+                socket.close();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
         }
     }
 

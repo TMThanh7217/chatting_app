@@ -3,6 +3,8 @@ import javax.swing.border.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 import java.io.*;
 import java.net.Socket;
 
@@ -13,6 +15,8 @@ public class Client extends JFrame implements Runnable, Serializable {
     public static String host = "localhost";
     public static int port = 6000;
     public static String username = "";
+    public static int fileSize = 10000;
+    public static Socket socketClient;
 
     public static void setUsername(String username) {
         Client.username = username;
@@ -46,6 +50,7 @@ public class Client extends JFrame implements Runnable, Serializable {
 
     BufferedWriter bfWriter;
     BufferedReader bfReader;
+    OutputStream os;
 
     // Set up all necessary layout
     // Center panel store chat screen, input area and send button
@@ -129,9 +134,10 @@ public class Client extends JFrame implements Runnable, Serializable {
                         port = myPort;
                         //System.out.println(port);
                         JOptionPane.showMessageDialog(myClient, "Connect to port " + port + " successfully");
-                        Socket socketClient = new Socket(host, port);
+                        socketClient = new Socket(host, port);
                         bfWriter = new BufferedWriter(new OutputStreamWriter(socketClient.getOutputStream()));
                         bfReader = new BufferedReader(new InputStreamReader(socketClient.getInputStream()));
+                        os = socketClient.getOutputStream();
                         Thread myThread = new Thread(myClient);
                         myThread.start();
                     } catch (Exception ex) {
@@ -164,12 +170,47 @@ public class Client extends JFrame implements Runnable, Serializable {
                 int option = fc.showOpenDialog(null);
                 // if user choose other option bfWriter will be null and throw exception so check it first
                 if (option == JFileChooser.APPROVE_OPTION) {
-                    String str = "user | " + username + "\n" + fc.getSelectedFile().getAbsolutePath();
+                    String path = fc.getSelectedFile().getAbsolutePath();
+                    String str = "user | " + username + "\n" + path + "\r\n";
+                    System.out.println("str: " + str);
+                    System.out.println("path: " + path);
+
                     try {
-                        bfWriter.write(str);
-                        bfWriter.write("\r\n");
+                        File file = new File(path);  // create a file
+                        FileInputStream fis = new FileInputStream(file);
+                        BufferedInputStream bis = new BufferedInputStream(fis);
+                        byte[] contents;
+                        long fileLength = file.length();
+
+                        String fileClientString = Long.toString(fileLength);
+                        System.out.println(fileClientString);
+                        long current = 0;
+
+                        byte[] strContent = str.getBytes();
+                        os.write(strContent);
+
+                        while(current != fileLength){
+                            int size = fileSize;
+                            if(fileLength - current >= size)
+                                current += size;
+                            else{
+                                size = (int)(fileLength - current);
+                                current = fileLength;
+                            }
+                            contents = new byte[size];
+                            System.out.println("size: " + size);
+                            System.out.println("current: " + current);
+                            System.out.println("contetns: " + contents);
+                            bis.read(contents, 0, size);
+                            System.out.println("Pass read");
+                            os.write(contents);
+                            byte[] newLine = "\n".getBytes();
+                            os.write(newLine);
+                            System.out.println("Pass write");
+                        }
                         bfWriter.flush();
-                    } catch (IOException e) {
+                        os.flush();
+                    } catch(IOException e) {
                         e.printStackTrace();
                     }
                 }

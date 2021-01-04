@@ -3,22 +3,20 @@ import javax.swing.border.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.io.BufferedReader;
-import java.io.BufferedWriter;
-import java.io.InputStreamReader;
-import java.io.OutputStreamWriter;
+import java.io.*;
 import java.net.Socket;
 
-public class User_1 extends JFrame implements Runnable {
+public class User1 extends JFrame implements Runnable, Serializable {
     public static int chatUIWidth = 800;
     public static int chatUIHeight = 450;
     public static int topMargin = chatUIWidth / 25;
     public static String host = "localhost";
     public static int port = 6000;
     public static String username = "";
+    public static int fileSize = 10000;
 
     public static void setUsername(String username) {
-        User_1.username = username;
+        User1.username = username;
     }
 
     JPanel contentPanel = new JPanel();
@@ -49,6 +47,7 @@ public class User_1 extends JFrame implements Runnable {
 
     BufferedWriter bfWriter;
     BufferedReader bfReader;
+    OutputStream os;
 
     // Set up all necessary layout
     // Center panel store chat screen, input area and send button
@@ -120,7 +119,7 @@ public class User_1 extends JFrame implements Runnable {
 
         //add event part
         //start thread when connect button is hit
-        User_1 myUser_1 = this;  //get current User_1
+        User1 myUser1 = this;  //get current User1
         connectBtn.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -130,19 +129,20 @@ public class User_1 extends JFrame implements Runnable {
                     //Open socket here
                     try {
                         port = myPort;
-                        System.out.println(port);
-                        JOptionPane.showMessageDialog(myUser_1, "Connect to port " + port + " successfully");
-                        Socket socketUser_1 = new Socket(host, port);
-                        bfWriter = new BufferedWriter(new OutputStreamWriter(socketUser_1.getOutputStream()));
-                        bfReader = new BufferedReader(new InputStreamReader(socketUser_1.getInputStream()));
-                        Thread myThread = new Thread(myUser_1);
+                        //System.out.println(port);
+                        JOptionPane.showMessageDialog(myUser1, "Connect to port " + port + " successfully");
+                        Socket socketUser1 = new Socket(host, port);
+                        bfWriter = new BufferedWriter(new OutputStreamWriter(socketUser1.getOutputStream()));
+                        bfReader = new BufferedReader(new InputStreamReader(socketUser1.getInputStream()));
+                        os = socketUser1.getOutputStream();
+                        Thread myThread = new Thread(myUser1);
                         myThread.start();
                     } catch (Exception ex) {
                         ex.printStackTrace();
                     }
                 }
                 else {
-                    JOptionPane.showMessageDialog(myUser_1, "Invalid port");
+                    JOptionPane.showMessageDialog(myUser1, "Invalid port");
                 }
             }
         });
@@ -163,24 +163,63 @@ public class User_1 extends JFrame implements Runnable {
 
         sendFileBtn.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent ae) {
-                String str = "user | " + username + "\n"+ inputArea.getText();
-                try {
-                    bfWriter.write(str);
-                    bfWriter.write("\r\n");
-                    bfWriter.flush();
-                } catch(Exception e){
-                    e.printStackTrace();
+                JFileChooser fc = new JFileChooser(); //points to user's default directory
+                int option = fc.showOpenDialog(null);
+                // if user choose other option bfWriter will be null and throw exception so check it first
+                if (option == JFileChooser.APPROVE_OPTION) {
+                    String path = fc.getSelectedFile().getAbsolutePath();
+                    String str = "user | " + username + "\n" + path + "\r\n";
+                    System.out.println("str: " + str);
+                    System.out.println("path: " + path);
+
+                    try {
+                        File file = new File(path);  // create a file
+                        FileInputStream fis = new FileInputStream(file);
+                        BufferedInputStream bis = new BufferedInputStream(fis);
+                        byte[] contents;
+                        long fileLength = file.length();
+
+                        String fileUser1String = Long.toString(fileLength);
+                        System.out.println(fileUser1String);
+                        long current = 0;
+
+                        byte[] strContent = str.getBytes();
+                        os.write(strContent);
+
+                        while(current != fileLength){
+                            int size = fileSize;
+                            if(fileLength - current >= size)
+                                current += size;
+                            else{
+                                size = (int)(fileLength - current);
+                                current = fileLength;
+                            }
+                            contents = new byte[size];
+                            System.out.println("size: " + size);
+                            System.out.println("current: " + current);
+                            System.out.println("contetns: " + contents);
+                            bis.read(contents, 0, size);
+                            System.out.println("Pass read");
+                            os.write(contents);
+                            byte[] newLine = "\n".getBytes();
+                            os.write(newLine);
+                            System.out.println("Pass write");
+                        }
+                        bfWriter.flush();
+                        os.flush();
+                    } catch(IOException e) {
+                        e.printStackTrace();
+                    }
                 }
-                inputArea.setText("");
             }
         });
     }
 
-    User_1(String myUsername) {
-        User_1.setUsername(myUsername);  // call this before adding any component
+    User1(String myUsername) {
+        User1.setUsername(myUsername);  // call this before adding any component
         setupLayout();
         addComponents();
-        this.setTitle("User_1");
+        this.setTitle("User1");
         this.setVisible(true);
         this.setSize(chatUIWidth, chatUIHeight);
         this.setLocationRelativeTo(null); // set window open at the middle of the screen
